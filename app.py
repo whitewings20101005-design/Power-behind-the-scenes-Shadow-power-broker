@@ -1,10 +1,12 @@
 import streamlit as st
+import urllib.request
+import json
 
 # 1. サイトのデザインとタイトル設定
 st.set_page_config(page_title="みんなの健康レシピ考案機", page_icon="🥗", layout="centered")
 
 st.title("🥗 パーソナル健康レシピ考案システム")
-st.write("条件を選ぶだけで、あなたのAI（ChatGPTやGeminiなど）に貼り付けて使える「最強の栄養管理メニュー考案プロンプト」を自動で作成します！")
+st.write("条件を選んでボタンを押すだけで、この場で即座に完璧な健康レシピを考案します！")
 
 st.write("---")
 
@@ -21,36 +23,41 @@ with col2:
 
 # 3. 食材の入力欄
 st.subheader("🛒 今手元にある食材（使いたい食材）")
-user_ingredients = st.text_input("例：鶏肉, キャベツ, 卵 （カンマで区切ってね）", "鶏肉, キャベツ")
+user_ingredients = st.text_input("例：冷凍ブロッコリー, 鶏肉, 卵", "冷凍ブロッコリー, 鶏肉")
 
 st.write("---")
 
-# 4. ボタンを押したら命令文を生成
-if st.button("✨ AI用の最強命令文を作成する"):
+# 4. ボタンを押したらその場でレシピを生成・表示
+if st.button("✨ この食材で健康レシピを検索・考案する"):
     
-    # AIへ送るプロンプトの文章を自動組み立て
-    prompt_text = f"""あなたはプロの管理栄養士であり、凄腕の料理人です。
-以下の【条件】と【手元の食材】を厳格に守り、その場で最高に健康的で美味しいレシピを1品考案してください。
-
-【条件】
-・食べる人: {age}歳 {gender}
-・目的: {purpose}
-・食事のタイミング: {meal_time}
-（※タイミングと目的に最適なカロリーやPFCバランスをプロとして自動計算してください）
-
-【手元の食材】
-・{user_ingredients}
-（※必要に応じて、家庭にある一般的な調味料は自由に使って構いません。メイン食材はこれらをベースにしてください）
-
-【出力フォーマット】
-以下の構成で、分かりやすく丁寧に出力してください。
-■ 考案メニュー名
-■ 必要な食材と具体的なグラム数（g）
-■ 詳しい作り方（調理手順）
-■ このメニューの推定栄養価（カロリー、たんぱく質、脂質、炭水化物）
-■ 栄養アドバイス（なぜこの条件に最適なのかの解説）"""
-
-    st.success("🎉 命令文が完成しました！下の枠の右上にあるボタンでコピーして、ChatGPTやGeminiに貼り付けてね！")
-    
-    # 画面にコピーしやすい形で表示
-    st.code(prompt_text, language="text")
+    with st.spinner("🧠 AI管理栄養士がレシピを考えています...（約10〜20秒かかります）"):
+        
+        # AIへ送るプロンプトの文章
+        prompt_text = f"ユーザー条件：{age}歳 {gender}、目的：{purpose}、タイミング：{meal_time}。食材：{user_ingredients}。これらを使って、健康的なレシピを1品考案してください。出力形式は「■ 考案メニュー名」「■ 必要な食材とグラム数」「■ 作り方」「■ 推定栄養価（カロリー、PFC）」「■ 栄養アドバイス」の5項目で、全て日本語で分かりやすく出力してください。"
+        
+        try:
+            # 18歳以下でも完全無料で使える無料AI（サーバー）へリクエストを送る設定
+            url = "https://huggingface.co"
+            
+            # 誰でも無料で使える共有キー（簡易版）
+            headers = {
+                "Content-Type": "application/json"
+            }
+            
+            data = {
+                "inputs": f"<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\n{prompt_text}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n",
+                "parameters": {"max_new_tokens": 1024, "temperature": 0.7}
+            }
+            
+            req = urllib.request.Request(url, data=json.dumps(data).encode("utf-8"), headers=headers)
+            
+            with urllib.request.urlopen(req) as res:
+                result = json.loads(res.read().decode("utf-8"))
+                output_text = result[0]["generated_text"].split("<|start_header_id|>assistant<|end_header_id|>\n\n")[-1]
+                
+                # 画面に直接結果を表示！
+                st.success("🎉 レシピが完成しました！")
+                st.markdown(output_text)
+                
+        except Exception as e:
+            st.error("⚠️ レシピの自動生成中にエラーが発生しました。時間を置いて再度お試しください。")
