@@ -34,16 +34,16 @@ if st.button("✨ この食材で健康レシピを検索・考案する"):
         
         # AIへ送るプロンプトの文章
         prompt_text = f"ユーザー条件：{age}歳 {gender}、目的：{purpose}、タイミング：{meal_time}。食材：{user_ingredients}。これらを使って、健康的で美味しいレシピを1品考案してください。出力形式は「■ 考案メニュー名」「■ 必要な食材とグラム数」「■ 作り方」「■ 推定栄養価（カロリー、PFC）」「■ 栄養アドバイス」の5項目で、全て日本語で分かりやすく出力してください。"
+        
         try:
             # 💡 修正箇所：自分専用のトークンを使ってAIを呼び出す
-                HF_TOKEN = "hf_...ccwA"
-
+            HF_TOKEN = "hf_...ccwA"
             
             url = "https://huggingface.co"
             
             headers = {
                 "Content-Type": "application/json",
-                "Authorization": f"Bearer {HF_TOKEN}"  # 自分専用の鍵をセット！
+                "Authorization": f"Bearer {HF_TOKEN}"
             }
             
             data = {
