@@ -33,15 +33,17 @@ if st.button("✨ この食材で健康レシピを検索・考案する"):
     with st.spinner("🧠 AI管理栄養士がレシピを考えています...（約10〜20秒かかります）"):
         
         # AIへ送るプロンプトの文章
-        prompt_text = f"ユーザー条件：{age}歳 {gender}、目的：{purpose}、タイミング：{meal_time}。食材：{user_ingredients}。これらを使って、健康的なレシピを1品考案してください。出力形式は「■ 考案メニュー名」「■ 必要な食材とグラム数」「■ 作り方」「■ 推定栄養価（カロリー、PFC）」「■ 栄養アドバイス」の5項目で、全て日本語で分かりやすく出力してください。"
-        
+        prompt_text = f"ユーザー条件：{age}歳 {gender}、目的：{purpose}、タイミング：{meal_time}。食材：{user_ingredients}。これらを使って、健康的で美味しいレシピを1品考案してください。出力形式は「■ 考案メニュー名」「■ 必要な食材とグラム数」「■ 作り方」「■ 推定栄養価（カロリー、PFC）」「■ 栄養アドバイス」の5項目で、全て日本語で分かりやすく出力してください。"
         try:
-            # 18歳以下でも完全無料で使える無料AI（サーバー）へリクエストを送る設定
+            # 💡 修正箇所：自分専用のトークンを使ってAIを呼び出す
+                HF_TOKEN = "hf_...ccwA"
+
+            
             url = "https://huggingface.co"
             
-            # 誰でも無料で使える共有キー（簡易版）
             headers = {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {HF_TOKEN}"  # 自分専用の鍵をセット！
             }
             
             data = {
@@ -53,11 +55,11 @@ if st.button("✨ この食材で健康レシピを検索・考案する"):
             
             with urllib.request.urlopen(req) as res:
                 result = json.loads(res.read().decode("utf-8"))
-                output_text = result[0]["generated_text"].split("<|start_header_id|>assistant<|end_header_id|>\n\n")[-1]
+                output_text = result["generated_text"].split("<|start_header_id|>assistant<|end_header_id|>\n\n")[-1]
                 
                 # 画面に直接結果を表示！
                 st.success("🎉 レシピが完成しました！")
                 st.markdown(output_text)
                 
         except Exception as e:
-            st.error("⚠️ レシピの自動生成中にエラーが発生しました。時間を置いて再度お試しください。")
+            st.error("⚠️ レシピの自動生成中にエラーが発生しました。トークンが正しいか確認し、時間を置いて再度お試しください。")
