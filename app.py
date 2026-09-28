@@ -1,23 +1,21 @@
 import streamlit as st
 
 # 1. サイトのデザインとタイトル設定
-st.set_page_config(page_title="みんなの健康レシピ考案機", page_icon="🥗", layout="centered")
+st.set_page_config(page_title="レシピ作成", page_icon=, layout="centered")
 
-st.title("🥗 パーソナル健康レシピ考案システム")
-st.write("条件を選ぶだけで、この場で即座に完璧な健康お弁当レシピを検索・計算します！")
-
-st.write("---")
+st.title("レシピ作成")
+st.write("性別、年齢、目的、何の時間に食べるかst.write("---")
 
 # 2. ユーザーがサイト上で選ぶ入力フォーム
 col1, col2 = st.columns(2)
 
 with col1:
-    gender = st.selectbox("👤 性別を選んでください", ["男性", "女性", "その他"])
-    age = st.number_input("🎂 年齢を入力してください", min_value=1, max_value=100, value=17)
+    gender = st.selectbox(" 性別を選んでください", ["男性", "女性", "その他"])
+    age = st.number_input(" 年齢を入力してください", min_value=1, max_value=100, value=17)
 
 with col2:
-    purpose = st.selectbox("🎯 目的を選んでください", ["健康維持（バランス）", "ダイエット（低カロリー）", "筋トレ（高タンパク）"])
-    meal_time = st.selectbox("⏰ 食事のタイミング", ["朝食", "昼食（お弁当）", "夕食", "間食"])
+    purpose = st.selectbox("目的を選んでください", ["健康維持（バランス）", "ダイエット（低カロリー）", "筋トレ（高タンパク）"])
+    meal_time = st.selectbox("何の時間", ["朝食", "昼食（お弁当）", "夕食", "間食"])
 
 # 3. 食材の入力欄
 st.subheader("🛒 今手元にある食材（使いたい食材）")
@@ -26,9 +24,9 @@ user_ingredients = st.text_input("例：ブロッコリー, 鶏肉, 卵", "ブ�
 st.write("---")
 
 # 4. ボタンを押したらその場でレシピを検索・計算
-if st.button("✨ この食材で健康レシピを検索・考案する"):
+if st.button("この食材でレシピを作成しますか？"):
     
-    with st.spinner("🧠 栄養管理システムが最適なバランスを計算中..."):
+    with st.spinner("レシピ作成中、お待ちください"):
         
         # 食材の表記ゆれに対応するため小文字・スペース削除
         ingredients_list = [i.strip() for i in user_ingredients.replace("、", ",").split(",")]
@@ -53,7 +51,7 @@ if st.button("✨ この食材で健康レシピを検索・考案する"):
         has_fish = "魚" in text or "鮭" in text or "サバ" in text or "ツナ" in text
 
         # 検索と出力のロジック
-        st.success("🎉 条件に最適な健康管理レシピが完成しました！")
+        st.success("条件に合うレシピを作成しました)
         st.write("---")
         
         if has_chicken and has_broccoli:
@@ -81,8 +79,8 @@ if st.button("✨ この食材で健康レシピを検索・考案する"):
             
         # 栄養価の表示
         st.write("---")
-        st.markdown(f"### 📊 推定栄養価（{meal_time}・{purpose}向けに自動計算）")
+        st.markdown(f"### 推定栄養価（{meal_time}・{purpose}向けに自動計算）")
         st.metric(label="エネルギー (目標目安)", value=f"{target_cal} kcal")
         st.markdown(f"🧬 **PFCバランス（目安）**\n{pfc_text}")
         
-        st.markdown(f"### 💡 栄養管理アドバイス\n{age}歳{gender}の{meal_time}として、午後の活動エネルギーを落とさずに{purpose}を最大限サポートする最高の重量バランスです。お弁当に入れる場合は、完全に冷ましてからフタをしてくださいね！")
+        st.markdown(f"###  栄養管理アドバイス\n{age}歳{gender}の{meal_time}として、午後の活動エネルギーを落とさずに{purpose}を最大限サポートする最高の重量バランスです。お弁当に入れる場合は、完全に冷ましてからフタをしてくださいね！")
